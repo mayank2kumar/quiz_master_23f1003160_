@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from app import app
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy(app)
 ## models
@@ -12,16 +12,26 @@ class User(db.Model):
     username = db.Column(db.String(32), unique=True, nullable=False)
     passhash = db.Column(db.String(512), nullable=False)
     fullname = db.Column(db.String(80), nullable=True)
-    qualification = db.Column(db.String(80), nullable=False)
-    DOB = db.Column(db.String(80), nullable=False)
+    qualification = db.Column(db.String(80), nullable=True)
+    DOB = db.Column(db.String(80), nullable=True)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, email, username, passhash, fullname, qualification, DOB):
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+    # so when someone tries to get the password it will raise this error.
+
+    def __init__(self, email, username, password, fullname, qualification, DOB,is_admin):
         self.email = email
-        self.username = email
-        self.passhash = passhash
+        self.username = username
+        self.passhash = generate_password_hash(password)
         self.fullname = fullname
         self.qualification = qualification
         self.DOB = DOB
+        self.is_admin = is_admin
+    def check_password(self, password):
+        return check_password_hash(self.passhash, password)  
+              
 
 class subject(db.Model):
     __tablename__ = 'subject'
@@ -85,10 +95,24 @@ class score(db.Model):
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
     ## relationships
-    user = db.relationship('user', backref='score')
+    # user = db.relationship('user', backref='score')
     # if we user.score, we get all score of that user
     # if we score.user, we get the user of that score
 
-    quiz = db.relationship('quiz', backref='score')
+    # quiz = db.relationship('quiz', backref='score')
     # if we quiz.score, we get all score of that quiz
     # if we score.quiz, we get the quiz of that score
+
+
+# creeate database if not exists
+with app.app_context():
+    db.create_all()
+    # create admin user if not exists
+    if not User.query.filter_by(is_admin=True).first():
+        admin = User(username='admin',password='admin',is_admin=True,DOB='',qualification='',fullname='',email='')
+        db.session.add(admin)
+        db.session.commit()
+        # create a default admin user if not exists
+        # this is a default admin user with username and password as admin
+        # it will be created at start of app when database is created
+        # so no one else will be able to create admin user as it is already created

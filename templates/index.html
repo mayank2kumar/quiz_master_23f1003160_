@@ -1,0 +1,47 @@
+{# <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>home page</title>
+</head>
+<body>
+    <h1>Ganpati bappa morya</h1>
+    <br>
+    <br>
+    <h4>Hello, {{user.username}}</h4>
+</body>
+</html> #}
+
+{% extends 'layout.html' %}
+
+{% block title %}Quiz Master - Home{% endblock %}
+
+{% block content %}
+    <header class="bg-primary text-white text-center py-5">
+        <div class="container">
+            <h1>Welcome to Quiz Master</h1>
+            <p class="lead">Your ultimate exam preparation platform for multiple courses.</p>
+            <a href="/register" class="btn btn-light btn-lg">Get Started</a>
+        </div>
+    </header>
+
+    <section class="container text-center my-5">
+        <h2>Why Choose Quiz Master?</h2>
+        <p>Quiz Master provides an interactive learning experience with quizzes curated by administrators for different courses.</p>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <h4>Multi-User Support</h4>
+                <p>Designed for both administrators and learners.</p>
+            </div>
+            <div class="col-md-4">
+                <h4>Course-Specific Quizzes</h4>
+                <p>Access quizzes for different subjects and enhance your learning.</p>
+            </div>
+            <div class="col-md-4">
+                <h4>Track Your Progress</h4>
+                <p>Keep track of your quiz results and improve over time.</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}
