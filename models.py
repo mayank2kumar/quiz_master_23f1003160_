@@ -11,10 +11,10 @@ class User(db.Model):
     email = db.Column(db.String(32), unique=True, nullable=False)
     username = db.Column(db.String(32), unique=True, nullable=False)
     passhash = db.Column(db.String(512), nullable=False)
-    fullname = db.Column(db.String(80), nullable=True)
+    fullname = db.Column(db.String(80), nullable=False)
     qualification = db.Column(db.String(80), nullable=True)
     DOB = db.Column(db.String(80), nullable=True)
-    is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=True)
 
     @property
     def password(self):
@@ -33,7 +33,7 @@ class User(db.Model):
         return check_password_hash(self.passhash, password)  
               
 
-class subject(db.Model):
+class Subject(db.Model):
     __tablename__ = 'subject'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     subject_name = db.Column(db.String(32), unique=True, nullable=False)
@@ -41,7 +41,7 @@ class subject(db.Model):
     subject_description = db.Column(db.String(512), nullable=True)
     subject_credit = db.Column(db.String(80), nullable=False)
 
-class chapter(db.Model):
+class Chapter(db.Model):
     __tablename__ = 'chapter'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     chapter_name = db.Column(db.String(32), unique=True, nullable=False)
@@ -49,57 +49,57 @@ class chapter(db.Model):
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'))
 
     ## relationships
-    subject = db.relationship('subject', backref='chapter')
+    subject = db.relationship('Subject', backref=db.backref('chapters', lazy=True))
     # if we subject.chapter, we get all chapter in that subject
     # if we chapter.subject, we get the subject of that chapter
     # lazy is true, so it will only load when called not automatically
 
-class quiz(db.Model):
+class Quiz(db.Model):
     __tablename__ = 'quiz'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    quiz_name = db.Column(db.String(32), unique=True, nullable=True)
+    quiz_name = db.Column(db.String(32), unique=False, nullable=True)
     quiz_description = db.Column(db.String(512), nullable=True)
-    date_of_quiz = db.Column(db.Date, nullable=False)
-    time_duration = db.Column(db.Time, nullable=False)
+    time_duration = db.Column(db.String(5), nullable=False)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
 
     ## relationships
-    chapter = db.relationship('chapter', backref='quiz')
+    chapter = db.relationship('Chapter',  backref='quiz', lazy=True)
+    
     # if we chapter.quiz, we get all quiz in that chapter
     # if we quiz.chapter, we get the chapter of that quiz
     # lazy is true, so it will only load when called not automatically
 
 
-class question(db.Model):
+class Question(db.Model):
     __tablename__ = 'question'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    question = db.Column(db.String(512), nullable=False)
+    question_text = db.Column(db.String(512), nullable=False)
     option1 = db.Column(db.String(512), nullable=False)
     option2 = db.Column(db.String(512), nullable=False)
     option3 = db.Column(db.String(512), nullable=False)
     option4 = db.Column(db.String(512), nullable=False)
     answer = db.Column(db.String(512), nullable=False)
-    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
-
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'),nullable=False)
+    question_title = db.Column(db.String(512), nullable=False)
     ## relationships
-    quiz = db.relationship('quiz', backref='question')
+    quiz = db.relationship('Quiz', backref='questions', lazy=True)
     # if we quiz.question, we get all question in that quiz
     # if we question.quiz, we get the quiz of that question
 
-class score(db.Model):
+class Score(db.Model):
     __tablename__ = 'score'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     total_score = db.Column(db.Integer, nullable=False)
     time_taken = db.Column(db.Time, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
     ## relationships
-    # user = db.relationship('user', backref='score')
+    # user = db.relationship('User', db.backref('scores', lazy=True))
     # if we user.score, we get all score of that user
     # if we score.user, we get the user of that score
 
-    # quiz = db.relationship('quiz', backref='score')
+    # quiz = db.relationship('Quiz', db.backref('scores', lazy=True))
     # if we quiz.score, we get all score of that quiz
     # if we score.quiz, we get the quiz of that score
 

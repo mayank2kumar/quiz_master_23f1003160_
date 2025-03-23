@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Subject</h2>
+    <form method="POST" action="{{ url_for('edit_subject', subject_id=subject.id) }}">
+        <div class="mb-3">
+            <label for="subject_name" class="form-label">Subject Name</label>
+            <input type="text" class="form-control" id="subject_name" name="subject_name" value="{{ subject.subject_name }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="subject_code" class="form-label">Subject Code</label>
+            <input type="text" class="form-control" id="subject_code" name="subject_code" value="{{ subject.subject_code }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="subject_description" class="form-label">Description</label>
+            <textarea class="form-control" id="subject_description" name="subject_description" rows="3" required>{{ subject.subject_description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="subject_credit" class="form-label">Credits</label>
+            <input type="number" class="form-control" id="subject_credit" name="subject_credit" value="{{ subject.subject_credit }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Subject</button>
+        <a href="{{ url_for('admin_home') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

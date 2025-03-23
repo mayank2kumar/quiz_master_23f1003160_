@@ -21,7 +21,7 @@
     </div>
     <div class="form-group">
         <label for="name" class="form-label">Name</label>
-        <input type="text" name="name" class="form-control">
+        <input type="text" name="name" required class="form-control">
     </div>
     <div class="form-group">
         <input type="submit" value="Register" class="btn btn-primary">
@@ -62,8 +62,8 @@
                     <input type="date" name="dob" class="form-control">
                 </div>
                 <div class="mb-3">
-                    <label for="fullname" class="form-label fw-bold">Full Name</label>
-                    <input type="text" name="fullname"  class="form-control" placeholder="Enter your full name">
+                    <label for="fullname" class="form-label fw-bold">Full Name<span class="text-danger">*</span></label>
+                    <input type="text" name="fullname" required class="form-control" placeholder="Enter your full name">
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label fw-bold">Password<span class="text-danger">*</span></label>

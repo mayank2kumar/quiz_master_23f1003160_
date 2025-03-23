@@ -8,18 +8,43 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         {% if 'user_id' in session %}
-          <li class="nav-item">
-            <a class="nav-link px-3" href="{{ url_for('index') }}">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link px-3" href="{{ url_for('profile') }}">Profile</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link px-3" href="{{ url_for('dashboard') }}">Dashboard</a>
-          </li>
+          {% if session['user_id'] != 1 %}
+            <form class="d-flex" action="{{ url_for('index') }}" method="GET">
+              <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('index') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('score') }}">Score</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('summary') }}">Summary</a>
+            </li>
+          {% endif %}
+          {% if session['user_id'] == 1 %}
+            <form class="d-flex" action="{{ url_for('index') }}" method="GET">
+              <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('admin_home') }}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('quiz') }}">Quiz</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('user_management') }}">User Management</a>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('summary') }}">Summary</a>
+            </li>
+          {% endif %}
+
           <li class="nav-item">
             <a class="nav-link px-3" href="{{ url_for('logout') }}">Logout</a>
           </li>
+
         {% else %}
           {% if request.endpoint != 'login' and request.endpoint != 'register' %}
             <li class="nav-item">

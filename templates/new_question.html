@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="text-center">Add New Question</h2>
+        <form method="POST" action="{{ url_for('new_question') }}">
+
+            
+            <h5>Adding Question to: </h5>
+            <h2><strong>{{ quiz.quiz_name }}</h2>  <!-- Show Subject Name -->
+            <br>
+            <!-- Make sure the subject_id is set correctly -->
+            <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+
+            <div class="mb-3">
+                <label for="question_title" class="form-label"><strong>Question title:</strong></label>
+                <input type="text" id="question_title" name="question_title" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="question_text" class="form-label"><strong>Question text:</strong></label>
+                <input type="text" id="question_text" name="question_text" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="option1" class="form-label"><strong>Option 1:</strong></label>
+                <input type="text" id="option1" name="option1" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="option2" class="form-label"><strong>Option 2:</strong></label>
+                <input type="text" id="option2" name="option2" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="option3" class="form-label"><strong>Option 3:</strong></label>
+                <input type="text" id="option3" name="option3" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="option4" class="form-label"><strong>Option 4:</strong></label>
+                <input type="text" id="option4" name="option4" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="answer" class="form-label"><strong>Answer:</strong></label>
+                <select id="answer" name="answer" class="form-control" required>
+                    <option value="" disabled selected>Select the correct answer</option>
+                    <option value="option1">Option 1</option>
+                    <option value="option2">Option 2</option>
+                    <option value="option3">Option 3</option>
+                    <option value="option4">Option 4</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a href="{{ url_for('quiz') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

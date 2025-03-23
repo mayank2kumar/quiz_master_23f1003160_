@@ -1,0 +1,142 @@
+{# {% extends "layout.html" %}
+
+{% block content %}
+    <div class="row mt-4">
+        <!-- Physics Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-white bg-primary">Physics</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Chapter Name</th>
+                                <th>No. of Questions</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Force</td>
+                                <td>xx</td>
+                                <td><a href="#">Edit/Delete</a></td>
+                            </tr>
+                            <tr>
+                                <td>EMF</td>
+                                <td>xx</td>
+                                <td><a href="#">Edit/Delete</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-danger">+ Chapter</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- App Dev-I Section -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-white bg-primary">App Dev-I</div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Chapter Name</th>
+                                <th>No. of Questions</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>HTML</td>
+                                <td>xx</td>
+                                <td><a href="#">Edit/Delete</a></td>
+                            </tr>
+                            <tr>
+                                <td>CSS</td>
+                                <td>xx</td>
+                                <td><a href="#">Edit/Delete</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-danger">+ Chapter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4 text-center">
+        <a class="btn btn-warning" href="{{ url_for('new_subject') }}">+ Add Subject</a>
+    </div>
+</div>
+{% endblock %} #}
+
+
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2>Subjects</h2>
+
+    {% if subjects %}
+        <div class="row mt-4">
+            {% for subject in subjects %}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header text-white bg-primary d-flex justify-content-between">
+                            <span> <h4>{{ subject.subject_name }}</h4></span>
+                            <span>
+                                <a href="{{ url_for('edit_subject', subject_id=subject.id) }}" class="btn btn-secondary">Edit</a> / 
+                                <a href="{{ url_for('delete_subject', subject_id=subject.id) }}" class="btn btn-danger"
+                                    onclick="return confirm('Are you sure you want to delete this subject?');">
+                                    Delete
+                                </a>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Code:</strong> {{ subject.subject_code }}</p>
+                            <p><strong>Credits:</strong> {{ subject.subject_credit }}</p>
+                            <p><strong>Description:</strong> {{ subject.subject_description }}</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Chapter Name</th>
+                                        <th>No. of Questions</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for chapter in subject.chapters %}
+                                    <tr>
+                                        <td>{{ chapter.chapter_name }}</td>
+                                        <td>
+                                            {% if chapter.quiz %}
+                                                {{ chapter.quiz[0].questions | length }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                        <td><a href="{{ url_for('edit_chapter', chapter_id=chapter.id) }}" class="btn btn-primary">Edit</a> / 
+                                            <a href="{{ url_for('delete_chapter', chapter_id=chapter.id) }}" class="btn btn-danger"
+                                                onclick="return confirm('Are you sure you want to delete this chapter?');">
+                                                Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <!-- Button dynamically links to the new_chapter page with subject_id -->
+                            <a href="{{ url_for('new_chapter', subject_id=subject.id) }}" class="btn btn-danger">+ Chapter</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+                    <div class="mt-4 text-center">
+                        <a class="btn btn-warning" href="{{ url_for('new_subject') }}">+ Add Subject</a>
+                    </div>
+        </div>
+    {% else %}
+        <p>No subjects found.</p>
+    {% endif %}
+{% endblock %}
