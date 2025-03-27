@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Search Results for "{{ query }}"</h2>
+
+    {% if results %}
+
+        {% if results.get('subjects') %}
+        <h4 class="mt-3">Subjects</h4>
+        <ul class="list-group">
+            <div class="row mt-4">
+                {% for subject in results['subjects'] %}
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header text-white bg-primary d-flex justify-content-between">
+                                <span> <h4>{{ subject.subject_name }}</h4></span>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Code:</strong> {{ subject.subject_code }}</p>
+                                <p><strong>Credits:</strong> {{ subject.subject_credit }}</p>
+                                <p><strong>Description:</strong> {{ subject.subject_description }}</p>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Chapter Name</th>
+                                            <th>No. of Questions</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for chapter in subject.chapters %}
+                                        <tr>
+                                            <td>{{ chapter.chapter_name }}</td>
+                                            <td>
+                                                {% if chapter.quiz %}
+                                                    {{ chapter.quiz[0].questions | length }}
+                                                {% else %}
+                                                    0
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                            {% if chapter.quiz %}
+                                                {% for quiz in chapter.quiz %}
+                                                    <a href="{{ url_for('user_view_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">View Quiz</a>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="text-muted">No Quiz</span>
+                                            {% endif %}
+                                            </td>
+
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </ul>
+        {% endif %}
+
+        {% if results.get('quizzes') %}
+        <h4 class="mt-3">Quizzes</h4>
+        <ul class="list-group">
+            <div class="card p-3 shadow-lg">
+            <h4 class="text-center text-warning">Quizzes</h4>
+            <table class="table table-bordered text-center mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <td>Quiz Name</td>
+                        <th>Date</th>
+                        <th>Duration (hh:mm)</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quiz in results['quizzes'] %}
+                    <tr>
+                        <td>{{ quiz.id }}</td>
+                        <td>{{ quiz.quiz_name }}</td>
+                        <td>xx</td>
+                        <td>{{ quiz.time_duration }}</td>
+                        <td>
+                            <a href="{{ url_for('user_view_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">View</a>
+                            <a href="{{ url_for('start_quiz', quiz_id=quiz.id) }}" class="btn btn-success btn-sm">Start</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        </ul>
+        {% endif %}
+
+    {% else %}
+        <p class="text-center text-muted">No results found.</p>
+    {% endif %}
+</div>
+{% endblock %}
