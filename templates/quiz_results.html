@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-primary text-center">Quiz Results</h2>
+    <p class="text-center">Your Score: {{ score_percentage }}%</p>
+
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Question</th>
+                <th>Your Answer</th>
+                <th>Correct Answer</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in feedback %}
+            <tr>
+                <td>{{ item.question_text }}</td>
+                <td>{{ item.user_answer or 'Not Attempted' }}</td>
+                <td>{{ item.correct_answer }}</td>
+                <td>
+                    {% if item.is_correct %}
+                    <span class="badge bg-success">Correct</span>
+                    {% else %}
+                    <span class="badge bg-danger">Incorrect</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('user_home') }}" class="btn btn-primary">Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}
