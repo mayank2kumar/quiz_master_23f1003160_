@@ -90,12 +90,14 @@ class Score(db.Model):
     __tablename__ = 'score'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     total_score = db.Column(db.Integer, nullable=False)
-    time_taken = db.Column(db.Time, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    obtained_score = db.Column(db.Integer, nullable=False)
+    score_percentage = db.Column(db.Integer,nullable=False)
+    time_taken = db.Column(db.Time, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     quiz_id = db.Column(db.Integer, db.ForeignKey('quiz.id'))
 
     ## relationships
-    # user = db.relationship('User', db.backref('scores', lazy=True))
+    user = db.relationship('User', backref='scores', lazy=True)
     # if we user.score, we get all score of that user
     # if we score.user, we get the user of that score
 

@@ -36,6 +36,178 @@ def user_required(f):
 def index():
     return render_template('index.html')
 
+@app.route('/user_home')
+@auth_required
+@user_required
+def user_home():
+    # subject_id = request.args.get('subject_id',type=int)
+    subjects = Subject.query.all()
+    chapters = Chapter.query.all()
+    quizzes = Quiz.query.all()
+    return render_template('user_home.html', user=User.query.get(session['user_id']), subjects=subjects, chapters=chapters, quizzes=quizzes)
+
+@app.route('/user_view_quiz')
+@auth_required
+@user_required
+def user_view_quiz():
+    quiz_id = request.args.get('quiz_id')
+    quiz = Quiz.query.get(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz.id).all()
+    
+    return render_template('user_quiz_view.html', user=User.query.get(session['user_id']), quiz=quiz, questions=questions)
+
+@app.route('/start_quiz', methods=['GET', 'POST'])
+@auth_required
+@user_required
+def start_quiz():
+    quiz_id = request.args.get('quiz_id')
+    question_number = request.args.get('question_number', 1, type=int)
+    number = request.args.get('number', 1, type=int)
+    quiz = Quiz.query.get(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz.id).all()
+
+    # Ensure the session has a dictionary for storing answers
+    if 'answers' not in session:
+        session['answers'] = {}
+
+    # Store selected answer if form is submitted
+    if request.method == 'POST':
+        selected_option = request.form.get('option')  # Get selected answer
+        if selected_option:
+            session['answers'][str(questions[question_number - 1].id)] = selected_option  # Store in session
+            session.modified = True  # Ensure session changes are saved
+
+    # Retrieve the current question
+    question = questions[question_number - 1]
+
+    # Retrieve previously selected answer if available
+    selected_answer = session['answers'].get(str(question.id), None)
+
+    return render_template(
+        'start_quiz.html',
+        user=User.query.get(session['user_id']),
+        quiz=quiz,
+        question=question,
+        question_number=question_number,
+        number=number,
+        selected_answer=selected_answer  # Pass selected answer to template
+    )
+
+@app.route('/submit_quiz')
+@auth_required
+@user_required
+def submit_quiz():
+    quiz_id = request.args.get('quiz_id')
+    quiz = Quiz.query.get(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz.id).all()
+    user_id = session['user_id']
+
+    # Retrieve stored answers
+    selected_answers = session.get('answers', {})
+
+    # Evaluate score
+    correct_count = 0
+    total_questions = len(questions)
+    feedback = []
+
+    for question in questions:
+        ans = question.answer
+        if ans == "option1":
+            correct_answer = question.option1
+        elif ans == "option2":
+            correct_answer = question.option2
+        elif ans == "option3":
+            correct_answer = question.option3
+        elif ans == "option4":
+            correct_answer = question.option4
+        user_answer = selected_answers.get(str(question.id), None)
+
+        # Check if the user's answer matches the correct answer
+        is_correct = user_answer == correct_answer
+        if is_correct:
+            correct_count += 1
+
+        # Store feedback for each question
+        feedback.append({
+            'question_text': question.question_text,
+            'user_answer': user_answer,
+            'correct_answer': correct_answer,
+            'is_correct': is_correct
+        })
+
+    # Calculate score percentage
+    score_percentage = (correct_count / total_questions) * 100
+
+    # Store the score in the database
+    new_score = Score(
+        total_score=total_questions,
+        obtained_score=correct_count,
+        # time_taken=datetime.now().time(),  # Store the time of completion
+        score_percentage = score_percentage,
+        user_id=user_id,
+        quiz_id=quiz.id
+    )
+    db.session.add(new_score)
+    db.session.commit()
+
+    # Clear answers from session after submission
+    session.pop('answers', None)
+
+    return render_template('quiz_results.html', quiz=quiz, feedback=feedback, score_percentage=score_percentage)
+
+@app.route('/search')
+@auth_required
+def search():
+    query = request.args.get('query', '').strip()
+    search_type = request.args.get('search_type', '').strip()
+    if not query:
+        return render_template('search_results.html', results=None, query=query)
+
+    user_id = session.get('user_id')
+    is_admin = (user_id == 1)  # Assuming user_id=1 is the admin
+
+    results = {}
+
+    if is_admin:
+        if search_type == 'user':
+            results['users'] = User.query.filter(User.username.ilike(f"%{query}%")).all()
+        elif search_type == 'subject':
+            results['subjects'] = Subject.query.filter(Subject.subject_name.ilike(f"%{query}%")).all()
+        elif search_type == 'quiz':
+            results['quizzes'] = Quiz.query.filter(Quiz.quiz_name.ilike(f"%{query}%")).all()
+        return render_template('search_results_admin.html', results=results, query=query)
+    else:
+            if search_type == 'subject':
+                results['subjects'] = Subject.query.filter(Subject.subject_name.ilike(f"%{query}%")).all()
+            elif search_type == 'quiz':
+                results['quizzes'] = Quiz.query.filter(Quiz.quiz_name.ilike(f"%{query}%")).all()
+            return render_template('search_results_user.html', results=results, query=query)
+
+
+
+
+@app.route('/user_subject')
+@auth_required
+@user_required
+def user_subject():
+    # subject_id = request.args.get('subject_id',type=int)
+    subjects = Subject.query.all()
+    chapters = Chapter.query.all()
+    quizzes = Quiz.query.all()
+    return render_template('user_subject.html', user=User.query.get(session['user_id']), subjects=subjects, chapters=chapters, quizzes=quizzes)
+
+
+@app.route('/score')
+@auth_required  # its just a Syntactic sugar
+@user_required
+def score():
+        user_id = session['user_id']
+    # Fetch scores for the logged-in user
+        quizzes = Quiz.query.all()
+        scores = Score.query.filter_by(user_id=user_id).all()
+        return render_template('score.html', scores=scores, quizzes=quizzes)
+
+# User management for admin dashboard 
 @app.route('/user_management')
 @auth_required
 @admin_required
@@ -55,7 +227,7 @@ def delete_user():
     return redirect(url_for('user_management'))
 
 
-
+# All the questions routes to edit,detele and create new questions
 
 @app.route('/edit_question')
 @auth_required
@@ -91,11 +263,6 @@ def edit_question_post():
     flash('Question updated successfully')
     return redirect(url_for('quiz'))
 
-
-
-
-
-
 @app.route('/delete_question')
 @auth_required
 @admin_required
@@ -106,8 +273,6 @@ def delete_question():
     db.session.commit()
     flash('Question deleted successfully')
     return redirect(url_for('quiz'))
-
-
 
 @app.route('/new_question')
 @auth_required
@@ -136,6 +301,7 @@ def new_question_post():
     return redirect(url_for('quiz'))
 
 
+# All the quiz routes to create new quiz,edit and detele quiz
 
 @app.route('/quiz')
 @auth_required
@@ -201,11 +367,16 @@ def edit_quiz_post():
 def delete_quiz():
     quiz_id = request.args.get('quiz_id')
     quiz = Quiz.query.get(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    for question in questions:
+        db.session.delete(question)
     db.session.delete(quiz)
     db.session.commit()
-    flash('Quiz deleted successfully')
+    flash('Quiz and its associated questions deleted successfully')
     return redirect(url_for('quiz'))
 
+
+# Routes for the admin home page
 
 @app.route('/admin_home')
 @auth_required
@@ -213,6 +384,9 @@ def delete_quiz():
 def admin_home():
     subjects = Subject.query.all()
     return render_template('admin_home.html', user=User.query.get(session['user_id']), subjects=subjects)
+
+
+# All the chapter routes to create new chapter,edit and detele chapter
 
 @app.route('/new_chapter')
 @auth_required
@@ -272,6 +446,8 @@ def delete_chapter():
     flash('Chapter deleted successfully')
     return redirect(url_for('admin_home'))
 
+
+# All the subject routes to create new subject,edit and detele subject
 
 @app.route('/new_subject')
 @auth_required
@@ -336,23 +512,55 @@ def edit_subject_post():
 def delete_subject():
     subject_id = request.args.get('subject_id')
     subject = Subject.query.get(subject_id)
+    for chapter in subject.chapters:
+        for quiz in chapter.quiz:
+            db.session.delete(quiz)
+        db.session.delete(chapter)
     db.session.delete(subject)
     db.session.commit()
-    flash('Subject deleted successfully')
+    flash('Subject and its associated chapters and quizzes deleted successfully')
     return redirect(url_for('admin_home'))
 
-
-
-@app.route('/summary')
+@app.route('/adminsummary')
+@admin_required
 @auth_required
-def summary():
-    return render_template('summary.html', user=User.query.get(session['user_id']))
+def adminsummary():
+    subjects = Subject.query.all()
+    subject_name = [subject.subject_name for subject in subjects]
+    chapter_count = [len(subject.chapters) for subject in subjects]
+    quiz_count = [sum(len(chapter.quiz) for chapter in subject.chapters) for subject in subjects]
+    quizs = Quiz.query.all()
+    quiz_name = [quiz.quiz_name for quiz in quizs]
+    max_scores = [db.session.query(db.func.max(Score.score_percentage)).filter(Score.quiz_id == quiz.id).scalar() for quiz in quizs]
+    min_scores = [db.session.query(db.func.min(Score.score_percentage)).filter(Score.quiz_id == quiz.id).scalar() for quiz in quizs]
+    return render_template('adminsummary.html', user=User.query.get(session['user_id']), subjects=subjects, subject_name=subject_name, chapter_count=chapter_count, quiz_count=quiz_count, quiz_name=quiz_name, max_scores=max_scores,min_scores=min_scores)
 
-@app.route('/score')
-@auth_required  # its just a Syntactic sugar
+
+@app.route('/usersummary')
+@auth_required
 @user_required
-def score():
-        return render_template('score.html', user=User.query.get(session['user_id']))
+def usersummary():
+    subjects = Subject.query.all()
+    subject_name = [subject.subject_name for subject in subjects]
+    chapter_count = [len(subject.chapters) for subject in subjects]
+    quiz_count = [sum(len(chapter.quiz) for chapter in subject.chapters) for subject in subjects]
+    average_scores = []
+    for subject in subjects:
+        quizzes = [quiz for chapter in subject.chapters for quiz in chapter.quiz]
+        if quizzes:
+            total_score = sum(
+                db.session.query(db.func.avg(Score.score_percentage))
+                .filter(Score.quiz_id == quiz.id)
+                .scalar() or 0
+                for quiz in quizzes
+            )
+            average_scores.append(total_score / len(quizzes))
+        else:
+            average_scores.append(0)
+    return render_template('usersummary.html',user=User.query.get(session['user_id']), subjects=subjects, subject_name=subject_name, chapter_count=chapter_count, quiz_count=quiz_count,average_scores=average_scores)
+
+
+# all the login, register and logout routes
 
 @app.route('/login')
 def login():

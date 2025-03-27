@@ -1,0 +1,58 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2>Subjects</h2>
+
+    {% if subjects %}
+        <div class="row mt-4">
+            {% for subject in subjects %}
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header text-white bg-primary d-flex justify-content-between">
+                            <span> <h4>{{ subject.subject_name }}</h4></span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Code:</strong> {{ subject.subject_code }}</p>
+                            <p><strong>Credits:</strong> {{ subject.subject_credit }}</p>
+                            <p><strong>Description:</strong> {{ subject.subject_description }}</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Chapter Name</th>
+                                        <th>No. of Questions</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for chapter in subject.chapters %}
+                                    <tr>
+                                        <td>{{ chapter.chapter_name }}</td>
+                                        <td>
+                                            {% if chapter.quiz %}
+                                                {{ chapter.quiz[0].questions | length }}
+                                            {% else %}
+                                                0
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                        {% if chapter.quiz %}
+                                            {% for quiz in chapter.quiz %}
+                                                <a href="{{ url_for('user_view_quiz', quiz_id=quiz.id) }}" class="btn btn-primary btn-sm">View Quiz</a>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="text-muted">No Quiz</span>
+                                        {% endif %}
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {%endif%}
+{% endblock %}

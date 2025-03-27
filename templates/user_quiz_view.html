@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center text-primary">View the Quiz</h2>
+
+    <div class="card p-4 shadow-lg mx-auto" style="max-width: 500px; border-radius: 15px;">
+        <div class="mb-3">
+            <label class="fw-bold">ID:</label>
+            <input type="text" class="form-control text-center" value="{{ quiz.id }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Quiz Name:</label>
+            <input type="text" class="form-control text-center fw-bold" value="{{ quiz.quiz_name }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Subject:</label>
+            <input type="text" class="form-control text-center fw-bold" value="{{ quiz.chapter.subject.subject_name }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Chapter:</label>
+            <input type="text" class="form-control text-center fw-bold" value="{{ quiz.chapter.chapter_name }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Number of Questions:</label>
+            <input type="text" class="form-control text-center" value="{{quiz.questions | length }}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Scheduled Date:</label>
+            <input type="text" class="form-control text-center" value="xx" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="fw-bold">Duration (hh:mm):</label>
+            <input type="text" class="form-control text-center" value="{{ quiz.time_duration }}" readonly>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ url_for('user_home') }}" class="btn btn-primary px-5">Close</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -9,22 +9,33 @@
       <ul class="navbar-nav ms-auto">
         {% if 'user_id' in session %}
           {% if session['user_id'] != 1 %}
-            <form class="d-flex" action="{{ url_for('index') }}" method="GET">
+            <form class="d-flex" action="{{ url_for('search') }}" method="GET">
+              <select class="form-select me-2" name="search_type">
+                <option value="subject">Subject</option>
+                <option value="quiz">Quiz</option>
+              </select>
               <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search">
               <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
             <li class="nav-item">
-              <a class="nav-link px-3" href="{{ url_for('index') }}">Home</a>
+              <a class="nav-link px-3" href="{{ url_for('user_home') }}">Home</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link px-3" href="{{ url_for('user_subject') }}">Subjects</a>
             <li class="nav-item">
               <a class="nav-link px-3" href="{{ url_for('score') }}">Score</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link px-3" href="{{ url_for('summary') }}">Summary</a>
+              <a class="nav-link px-3" href="{{ url_for('usersummary') }}">Summary</a>
             </li>
           {% endif %}
           {% if session['user_id'] == 1 %}
-            <form class="d-flex" action="{{ url_for('index') }}" method="GET">
+            <form class="d-flex" action="{{ url_for('search') }}" method="GET">
+              <select class="form-select me-2" name="search_type">
+                <option value="subject">Subject</option>
+                <option value="quiz">Quiz</option>
+                <option value="user">User</option>
+              </select>
               <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search">
               <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
@@ -37,7 +48,7 @@
             <li class="nav-item">
               <a class="nav-link px-3" href="{{ url_for('user_management') }}">User Management</a>
             <li class="nav-item">
-              <a class="nav-link px-3" href="{{ url_for('summary') }}">Summary</a>
+              <a class="nav-link px-3" href="{{ url_for('adminsummary') }}">Summary</a>
             </li>
           {% endif %}
 
