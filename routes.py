@@ -160,8 +160,6 @@ def submit_quiz():
 def search():
     query = request.args.get('query', '').strip()
     search_type = request.args.get('search_type', '').strip()
-    if not query:
-        return render_template('search_results.html', results=None, query=query)
 
     user_id = session.get('user_id')
     is_admin = (user_id == 1)  # Assuming user_id=1 is the admin
@@ -169,6 +167,8 @@ def search():
     results = {}
 
     if is_admin:
+        if not query:
+            return render_template('search_results_admin.html', results=None, query=query)
         if search_type == 'user':
             results['users'] = User.query.filter(User.username.ilike(f"%{query}%")).all()
         elif search_type == 'subject':
@@ -177,11 +177,13 @@ def search():
             results['quizzes'] = Quiz.query.filter(Quiz.quiz_name.ilike(f"%{query}%")).all()
         return render_template('search_results_admin.html', results=results, query=query)
     else:
-            if search_type == 'subject':
-                results['subjects'] = Subject.query.filter(Subject.subject_name.ilike(f"%{query}%")).all()
-            elif search_type == 'quiz':
-                results['quizzes'] = Quiz.query.filter(Quiz.quiz_name.ilike(f"%{query}%")).all()
-            return render_template('search_results_user.html', results=results, query=query)
+        if not query:
+            return render_template('search_results_user.html', results=None, query=query)
+        if search_type == 'subject':
+            results['subjects'] = Subject.query.filter(Subject.subject_name.ilike(f"%{query}%")).all()
+        elif search_type == 'quiz':
+            results['quizzes'] = Quiz.query.filter(Quiz.quiz_name.ilike(f"%{query}%")).all()
+        return render_template('search_results_user.html', results=results, query=query)
 
 
 
