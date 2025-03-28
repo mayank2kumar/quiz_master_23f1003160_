@@ -5,9 +5,8 @@
         <h2 class="text-center">Add New Chapter</h2>
         <form method="POST" action="{{ url_for('new_chapter') }}">
 
-            <h2>Adding Chapter to: {{ subject.subject_name }}</h2>  <!-- Show Subject Name -->
+            <h2>Adding Chapter to: {{ subject.subject_name }}</h2>
 
-            <!-- Make sure the subject_id is set correctly -->
             <input type="hidden" name="subject_id" value="{{ subject.id }}">
 
             <div class="mb-3">
@@ -19,15 +18,6 @@
                 <label for="chapter_description" class="form-label"><strong>Description:</strong></label>
                 <textarea id="chapter_description" name="chapter_description" class="form-control" rows="3"></textarea>
             </div>
-
-            {# <label for="subject_id">Subject:</label>
-            <select id="subject_id" name="subject_id" class="form-control" required>
-                {% for subject in subjects %}
-                    <option value="{{ subject.id }}" {% if subject.id|string == selected_subject_id %}selected{% endif %}>
-                        {{ subject.subject_name }}
-                    </option>
-                {% endfor %}
-            </select> #}
 
             <button type="submit" class="btn btn-primary">Save</button>
             <a href="{{ url_for('admin_home') }}" class="btn btn-secondary">Cancel</a>

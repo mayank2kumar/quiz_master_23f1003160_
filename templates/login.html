@@ -1,30 +1,3 @@
-{# {% extends 'layout.html' %}
-
-{% block title %}
-    Login Page
-{% endblock %}
-
-{% block content %}
-
-<h1 class="display-1">Login</h1>
-
-<form action="" class="form" method="post">
-    <div class="form-group">
-        <label for="username" class="form-label">Username</label>
-        <input type="text" name="username" required class="form-control">
-    </div>
-    <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" name="password" required class="form-control">
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Login" class="btn btn-primary">
-    </div>
-</form>
-    
-{% endblock %} #}
-
-
 {% extends 'layout.html' %}
 
 {% block title %}
@@ -37,7 +10,6 @@
         <div class="card-body">
             
 
-            <!-- Login Form -->
             <h2 class="text-center text-primary mb-3">Login</h2>
             <form method="post">
                 <div class="mb-3">
@@ -53,7 +25,6 @@
                 </div>
             </form>
             <div class="mb-2"></div>
-            <!-- Toggle Button -->
             <div class="text-center mb-4">
                 <span><h5>Don't have an account?</h5></span>
                 <button class="btn btn-outline-primary btn-sm" onclick="switchToRegister()">Register</button>
